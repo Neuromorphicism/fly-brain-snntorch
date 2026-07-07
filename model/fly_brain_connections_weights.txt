@@ -1,0 +1,3 @@
+This file in the .pth format with dense tensors will weight around 60 GB!
+This file in the .pth format with sparse tensors will weight only 280 MB!
+You can create it in the fly_brain.py script
