@@ -60,7 +60,7 @@ params = {
     "tau_membrane": 20.0,         # 20 ms per https://arxiv.org/html/2508.16792v1 this is only used to calculate beta below TRY 5 ms for faster leak
     "threshold_level": 1.0,       # threshold of neuron was -45 mV TRY 1.0 or 0.83
     "reset_level": 0.0,           # reset was -52 mV this can only be 0.0 in snnTorch LIF neuron with use of reset_mechanism
-    "weight_per_synapse": 0.05,   # constant base weight of all synapses was 0.275 TRY 0.05 or 0.15
+    "weight_per_synapse": 0.05,   # constant base weight of all synapses was 0.275 TRY 0.15 or 0.05 or even lower like 1.0/500 (0.002) because of large Connectivity column values (1 to 2358)
 
     "rate_poisson": 150.0,        # 150 Hz per https://arxiv.org/html/2508.16792v1
     "frequency_poisson": 250.0,   # 250 Hz original value in Brian2 implementation
@@ -68,12 +68,14 @@ params = {
     "timesteps_to_run": 1000,     # adjust it to 100 on weak CPU or to 100000 if you have a good GPU
 }
 
-
 # snnTorch LIF neuron is used here but a model with snnTorch Lapicque or Synaptic or Alpha can also be implemented
 
 LIF_NEURON = snn.Leaky(
     beta = 1 - (params["dt"] / params["tau_membrane"]),
+    # tau_membrane ranges from 10 ms to 100 ms in real neurons so maybe it is better for each LIF to learn their tau?
+    # learn_beta = True,
     threshold = params["threshold_level"],
+    # This LIF neuron might work much better if snnTorch will add "refractory" reset_mechanism TRY also "none" and "subtract" in place of "zero"
     reset_mechanism = "zero",
 ).to(device)
 
@@ -91,6 +93,8 @@ def build_weights_matrix(neurons_connections, number_of_neurons, weight_per_syna
     postsynaptic_index = torch.tensor(neurons_connections["Postsynaptic_Index"].values, dtype=torch.long, device=device)
 
     # Some weights might be negative, which represent the inhibitory synapses
+    # Connectivity (number of synapses between two neurons) in data: MAX value is 2358, MIN value is 1 
+    # Excitatory in data: can be 1 (excitatory synapses) or -1 (inhibitory synapses)
     # TODO: This probably could be optimized through the calculated single weight from different weights in same pre/post connections
     # If one neuron receives multiple inputs then those can be joined with a method described in: https://arxiv.org/html/2508.16792v1
     final_weights = torch.tensor(neurons_connections["Excitatory x Connectivity"].values, device=device) * weight_per_synapse
@@ -209,6 +213,8 @@ def run_spiking_neural_network(neurons_list, neurons_connections, params):
     # dt = 0.1 and timesteps_to_run = 100 so 1000 dense steps took 4 hours on M2 Max CPU mode
     # 1000 sparse COO steps took 5 minutes on M2 Max CPU mode
     # 1000 sparse CSR steps took 5 seconds on M2 Max CPU mode
+    # TODO: 10 simulated seconds took 35 real-life seconds on M2 Max CPU mode so for it to be a real-time simulation it should take 10 real-life seconds or even less
+    # 1 hour of working simulated fruit fly brain would require 3.5 hours of computing
     for step in range(steps):
 
         # Synaptic input
