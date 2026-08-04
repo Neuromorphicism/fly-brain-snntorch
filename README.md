@@ -34,7 +34,7 @@ There will be 5 more experiments added in the future:
 
 <br>
 
-The variable `chosen_sensory_neurons` (line 175) in `fly_brain.py` allows you to change the stiumalted sensory neurons.
+The variable `chosen_sensory_neurons` (line 179) in `fly_brain.py` allows you to change the stiumalted sensory neurons.
 
 <br>
 
