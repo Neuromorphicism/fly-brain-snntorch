@@ -244,7 +244,7 @@ In the future you can also try to implement in snnTorch the [full nervous system
 
 ## Male Fruit Fly Nervous System
 
-You can try to channge the connectome into entire nervous system with its FEATHER files found here: https://male-cns.janelia.org/download/#__tabbed_3_3
+You can try to change the connectome into entire nervous system with its FEATHER files found here: https://male-cns.janelia.org/download/#__tabbed_3_3
 
 The Male CNS dataset is licensed under CC BY: FlyEM (HHMI Janelia), the University of Cambridge (Dept. of Zoology), the MRC Laboratory of Molecular Biology, Google Research.
 
